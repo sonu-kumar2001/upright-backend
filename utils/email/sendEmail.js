@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-const mg = require("nodemailer-mailgun-transport");
 const handlebars = require("handlebars");
 const fs = require("fs");
 const path = require("path");
@@ -11,16 +10,20 @@ const sendEmail = (res, email, subject, payload, template, messsage) => {
       "utf8"
     );
     const compiledTemplate = handlebars.compile(emailTemplateSource);
-    const mailgunAuth = {
+
+    const mailSettings = {
+      service: "gmail",
+      port: 465,
+      secure: true,
       auth: {
-        api_key: process.env.EMAIL_API_KEY,
-        domain: process.env.DOMAIN,
+        user: process.env.MAIL_EMAIL,
+        pass: process.env.MAIL_PASSWORD,
       },
     };
 
-    const smtpTransport = nodemailer.createTransport(mg(mailgunAuth));
+    const smtpTransport = nodemailer.createTransport(mailSettings);
     const options = () => ({
-      from: process.env.FROM_EMAIL,
+      from: process.env.MAIL_EMAIL,
       to: email,
       subject,
       html: compiledTemplate(payload),

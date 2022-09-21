@@ -11,7 +11,7 @@ const userProfile = new Schema(
     verified: { type: Boolean, default: false },
     verifyLink: { type: String, default: "" },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 // eslint-disable-next-line func-names

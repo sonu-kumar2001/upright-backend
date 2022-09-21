@@ -1,8 +1,8 @@
-const { sign, verify } = require("jsonwebtoken");
+const { verify } = require("jsonwebtoken");
 const { compare } = require("bcrypt");
 const userService = require("../service/user.service");
 const authentication = require("../routes/v1/authentication/authenticate");
-const sendEmail = require("../utils/email/sendEmail");
+// const sendEmail = require("../utils/email/sendEmail");
 const helper = require("../utils/helper");
 
 const userController = {
@@ -25,31 +25,39 @@ const userController = {
         email,
         password,
       });
-      if (user) {
-        const userId = user.id;
-        const token = await sign({ userId }, process.env.EMAIL_SECRET, {
-          expiresIn: 1800,
-        });
-        const link = `${process.env.CLIENT_URL}/verify?token=${token}`;
-        const updatedUser = await userService.updateUser(email, {
-          verifyLink: token,
-        });
-        if (updatedUser) {
-          sendEmail(
-            res,
-            user.email,
-            "Verify Email",
-            {
-              name: user.fullName,
-              link,
-            },
-            "./template/template.hbs",
-            "Please Verify your email"
-          );
-        } else {
-          return res.status(400).json({ err: "verify password link error" });
-        }
-      } else return res.status(400).json({ err: "User doesn't Exists" });
+      const createdToken = await authentication.generateJwt(user);
+      res.status(201).json({
+        user: {
+          ...helper.userInfo(user),
+          createdToken,
+        },
+        message: "User created Successfully",
+      });
+      // if (user) {
+      //   const userId = user.id;
+      //   const token = await sign({ userId }, process.env.EMAIL_SECRET, {
+      //     expiresIn: 1800,
+      //   });
+      //   const link = `${process.env.CLIENT_URL}/verify?token=${token}`;
+      //   const updatedUser = await userService.updateUser(email, {
+      //     verifyLink: token,
+      //   });
+      //   if (updatedUser) {
+      //     sendEmail(
+      //       res,
+      //       user.email,
+      //       "Verify Email",
+      //       {
+      //         name: user.fullName,
+      //         link,
+      //       },
+      //       "./template/template.hbs",
+      //       "Please Verify your email"
+      //     );
+      //   } else {
+      //     return res.status(400).json({ err: "verify password link error" });
+      //   }
+      // } else return res.status(400).json({ err: "User doesn't Exists" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -98,11 +106,11 @@ const userController = {
           error: "User doesn't exists",
         });
       }
-      if (!user.isVerified) {
-        return res.status(400).json({
-          error: "User is not verified",
-        });
-      }
+      // if (!user.isVerified) {
+      //   return res.status(400).json({
+      //     error: "User is not verified",
+      //   });
+      // }
       const result = await compare(password, user.password);
       if (user && result) {
         const token = await authentication.generateJwt(user);
@@ -110,7 +118,7 @@ const userController = {
           userInfo: { ...helper.userInfo(user), token },
           message: "User logged in successfully",
         });
-      }
+      } return res.status(403).json({ err: "credential is incorrect" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
