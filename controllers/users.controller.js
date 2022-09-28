@@ -8,8 +8,10 @@ const helper = require("../utils/helper");
 const userController = {
   signup: async (req, res) => {
     try {
-      const { fullName, email, password } = req.body;
-      if (!fullName || !email || !password) {
+      const {
+        fullName, email, password, role
+      } = req.body;
+      if (!fullName || !email || !password || !role) {
         return res.status(400).json({
           error: "Please fill all the fields",
         });
@@ -24,6 +26,7 @@ const userController = {
         fullName,
         email,
         password,
+        role
       });
       const createdToken = await authentication.generateJwt(user);
       res.status(201).json({
@@ -118,7 +121,8 @@ const userController = {
           userInfo: { ...helper.userInfo(user), token },
           message: "User logged in successfully",
         });
-      } return res.status(403).json({ err: "credential is incorrect" });
+      }
+      return res.status(403).json({ err: "credential is incorrect" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({

@@ -7,6 +7,7 @@ module.exports = {
         fullName: userObj.fullName,
         email: userObj.email,
         password: userObj.password,
+        role: userObj.role,
       });
       const response = await user.save();
       return response;

@@ -22,6 +22,7 @@ module.exports = {
       const response = await coacheeDetails.save();
       return response;
     } catch (error) {
+      console.log(error);
       return [];
     }
   },

@@ -2,7 +2,7 @@ const { sign, verify } = require("jsonwebtoken");
 
 module.exports = {
   generateJwt: async (user) => {
-    const payload = { userId: user.id, email: user.email };
+    const payload = { userId: user.id, email: user.email, role: user.role };
     const token = await sign(payload, process.env.SECRET, {
       expiresIn: "7d",
     });

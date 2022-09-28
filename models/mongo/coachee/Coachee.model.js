@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const coacheeDetails = new Schema(
   {
     companyName: { type: String },
-    mobileNumber: { type: Number, max: 10, min: 10 },
+    mobileNumber: { type: Number },
     profession: { type: String },
     jobTitle: { type: String },
     preferredLanguage: { type: String },
